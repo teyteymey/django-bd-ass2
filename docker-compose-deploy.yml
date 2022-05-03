@@ -9,7 +9,6 @@ services:
     environment:
       - SECRET_KEY=samplesecret123
       - ALLOWED_HOSTS=127.0.0.1,localhost
-    command: sh -c "python manage.py makemigrations && python manage.py migrate"
 
   proxy:
     build:
