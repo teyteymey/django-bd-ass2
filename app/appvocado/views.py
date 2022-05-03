@@ -1,12 +1,12 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.contrib.auth.models import User
-from appvocado.serializers import UserSerializer
-from appvocado.serializers import ReservationSerializer
+from appvocado.serializers import CustomRegisterSerializer
+from appvocado.serializers import ReservationSerializer, OfferSerializer, UserSerializer
 from appvocado.models import Reservation, Offer, Category, UserReview
 
 
@@ -72,25 +72,36 @@ class ReservationList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view()
-def null_view(request):
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+# Displays a list of offers in the system.
+class OfferList(APIView):
+
+    def get(self, request, format=None):
+        offer = Offer.objects.all()
+        serializer = OfferSerializer(offer, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = OfferSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetail(APIView):  #get, put and delete
 
-    def get(self, request, username):       #only the user can request this
+    def get(self, request):       #only the user can request this
         #if not request.user.is_authenticated: raise NotAuthenticated
-        user = get_object_or_404(User, username=username)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+        serializer = CustomRegisterSerializer(request.user)
+        return Response(serializer.data)  
 
-    def put(self, request, username):
-        user = User.objects.get(username = username)
-        serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request):
+        fn = self.request.data.get('first_name')
+        ln = self.request.data.get('last_name')
+        email = self.request.data.get('email')
+        # user = get_list_or_404(User, username=request.user.username) 
+        # user.update(first_name=fn, last_name = ln)
+        User.objects.filter(username = request.user.username).update(first_name=fn, last_name = ln, email = email)
+        return Response (status = status.HTTP_200_OK)
 
     def delete(self, request, username):
         if username == request.user.username:
@@ -98,3 +109,25 @@ class UserDetail(APIView):  #get, put and delete
             user.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         Response({"Message": "You can only delete your own account!"},status=status.HTTP_401_UNAUTHORIZED)
+
+# Returns de details of a reservation. Only authorised and logged in users can access this view, and only
+# treat with reservations that are their own.
+class ReservationDetail(APIView):      #/rooms/pk: get, put and delete
+
+    def get(self, request, id, username):
+        res = get_object_or_404(Reservation, id = id)
+        resUsername= res.username.username.strip()  #because it had some white spaces and the comparison did not work
+        if resUsername == request.user.username:   #if the user doing the call is the same of the reservation to see
+            serializer = ReservationSerializer(res)
+            return Response(serializer.data)
+        else:
+            return Response({"Message": "You can not see the reservation details of another user."},status=status.HTTP_403_FORBIDDEN)
+    
+    def delete(self, request, id, username):
+        res = get_object_or_404(Reservation, id = id)
+        resUsername= res.username.username.strip()
+        if resUsername == request.user.username:    #if the user doing the call is the same of the reservation to delete
+            res.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"Message": "You can not delete the reservation of another user."},status=status.HTTP_403_FORBIDDEN)

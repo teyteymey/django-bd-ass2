@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
+from datetime import timedelta
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -166,3 +167,8 @@ EMAIL_VERIFICATION = 'optional'
 ACCOUNT_EMAIL_REQUIRED = False
 
 LOGIN_URL = 'http://localhost:8000/login'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30), #set to a long period to debug easily, if not it expires too quickly and its annoying
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+}
