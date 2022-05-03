@@ -1,3 +1,5 @@
+from email import message
+import re
 from unicodedata import category
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework.decorators import api_view
@@ -65,12 +67,21 @@ class ReservationList(APIView):
         serializer = ReservationSerializer(reservation, many=True)
         return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = ReservationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, format = None):
+        try:
+            offer_userId = Offer.objects.get(id = request.data["offer_id"]).user_id
+        except:
+            return Response({"Message": "The offer does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.id != offer_userId.id: #meaning it is not my own offer
+            request.data["user_id"] = request.user.id
+            serializer = ReservationSerializer(data=request.data)
+            try:
+                serializer.is_valid()
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except:
+                return Response({"Message": "You already reserved this item"},status=status.HTTP_409_CONFLICT)
+        return Response({"Message": "You can not reserve your own item."}, status=status.HTTP_400_BAD_REQUEST)
 
 # Displays a list of offers in the system.
 class OfferList(APIView):
