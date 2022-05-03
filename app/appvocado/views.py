@@ -172,3 +172,21 @@ class CategoryDetails(APIView):
         cat = get_object_or_404(Category, id = id)
         serializer = CategorySerializer(cat)
         return Response(serializer.data)
+
+# Returns all the requests for my offers
+class OfferRequests(APIView):
+    def get(self, request):
+        wanted_items = set()
+        for item in Offer.objects.filter(user_id = request.user.id):
+            wanted_items.add(item.id)
+
+        requests = Reservation.objects.filter(offer_id__in = wanted_items)
+        serializer = ReservationSerializer(requests, many = True)
+        return Response(serializer.data)
+
+# Returns all the requests for my offers
+class myOffers(APIView):
+    def get(self, request):
+        offers = Offer.objects.filter(user_id = request.user.id)
+        serializer = OfferSerializer(offers, many = True)
+        return Response(serializer.data)
