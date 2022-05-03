@@ -110,8 +110,6 @@ class UserDetail(APIView):  #get, put and delete
         fn = self.request.data.get('first_name')
         ln = self.request.data.get('last_name')
         email = self.request.data.get('email')
-        # user = get_list_or_404(User, username=request.user.username) 
-        # user.update(first_name=fn, last_name = ln)
         User.objects.filter(username = request.user.username).update(first_name=fn, last_name = ln, email = email)
         return Response (status = status.HTTP_200_OK)
 
@@ -190,3 +188,32 @@ class myOffers(APIView):
         offers = Offer.objects.filter(user_id = request.user.id)
         serializer = OfferSerializer(offers, many = True)
         return Response(serializer.data)
+
+# Returns all the requests for my offers
+class viewRequest(APIView):
+    def get(self, request, id):
+        wanted_items = set()
+        for item in Offer.objects.filter(user_id = request.user.id):
+            wanted_items.add(item.id)
+
+        requests = Reservation.objects.filter(offer_id__in = wanted_items)
+        try:
+            request = get_object_or_404(requests, id = id)
+        except:
+            return Response({"Message": "You can not see the request of another user."},status=status.HTTP_403_FORBIDDEN)
+        serializer = ReservationSerializer(request)
+        return Response(serializer.data)
+    
+    def put(self, request, id):
+        wanted_items = set()
+        for item in Offer.objects.filter(user_id = request.user.id):
+            wanted_items.add(item.id)
+
+        requests = Reservation.objects.filter(offer_id__in = wanted_items)
+        try:
+            request = get_object_or_404(requests, id = id)
+        except:
+            return Response({"Message": "You can not accept the request of another user."},status=status.HTTP_403_FORBIDDEN)
+        accepted = self.request.data.get('accepted')
+        Reservation.objects.filter(id = id).update(accepted = accepted)
+        return Response (status = status.HTTP_200_OK)

@@ -18,5 +18,6 @@ urlpatterns = [
     path('categories/', views.CategoryList.as_view(), name='view_categories'),
     path('categories/<int:id>', views.CategoryDetails.as_view(), name='view_category_details'),
     path('user/requests', views.OfferRequests.as_view()),
+    path('user/requests/<int:id>', views.viewRequest.as_view()),
     path('user/offers', views.myOffers.as_view()),
 ]
