@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
-from appvocado.models import Category, Offer, Reservation, UserReview
+from appvocado.models import Category, Offer, Reservation, UserReview, Friends
 
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
@@ -39,7 +39,12 @@ class ReservationSerializer(serializers.ModelSerializer):
 class UserReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserReview
-        fields = ('id', 'user_id', 'reviewer:id', 'rating')
+        fields = ('id', 'user_id', 'reviewer_id', 'rating')
+
+class FriendsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friends
+        fields = ('id', 'user_id_1', 'user_id_2')
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

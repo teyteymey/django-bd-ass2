@@ -100,11 +100,19 @@ class OfferList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class FriendDetail(APIView):  #get
+
+    def get(self, request, id):
+        user = User.objects.get(id = id)
+        serializer = CustomRegisterSerializer(user)
+        return Response(serializer.data)  
+
 class UserDetail(APIView):  #get, put and delete
 
     def get(self, request):
         serializer = CustomRegisterSerializer(request.user)
         return Response(serializer.data)  
+
 
     def put(self, request):
         fn = self.request.data.get('first_name')

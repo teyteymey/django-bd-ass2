@@ -12,12 +12,13 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('reset_pass/', PasswordChangeView.as_view()),
     path('user/', views.UserDetail.as_view()),
+    path('user/<int:id>', views.FriendDetail.as_view()),
     path('reservations/', views.ReservationList.as_view(), name='view_reservations'),
     path('offers/', views.OfferList.as_view(), name='view_offers'),
     path('offers/<int:id>', views.OfferDetails.as_view(), name='view_offer_details'),
     path('categories/', views.CategoryList.as_view(), name='view_categories'),
     path('categories/<int:id>', views.CategoryDetails.as_view(), name='view_category_details'),
     path('user/requests', views.OfferRequests.as_view()),
-    path('user/requests/<int:id>', views.viewRequest.as_view()),
+    path('user/requests/<int:id>', views.viewRequest.as_view()), #accept it and see it
     path('user/offers', views.myOffers.as_view()),
 ]

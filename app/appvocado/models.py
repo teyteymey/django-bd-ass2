@@ -59,3 +59,15 @@ class UserReview(models.Model):
     
         def __str__(self):
             return 'user_id: ' + self.user_id + ' reviewer_id: ' + self.reviewer_id + ' rating: ' + self.rating
+
+class Friends(models.Model):
+    user_id_1 = models.IntegerField();
+    user_id_2 = models.IntegerField();
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields= ['user_id_1', 'user_id_2'], name='unique_friends'),
+        ]
+    
+        def __str__(self):
+            return 'user_id_1: ' + self.user_id_1 + ' user_id_2: ' + self.user_id_2
