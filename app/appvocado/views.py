@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.contrib.auth.models import User
+from appvocado.models import FavoriteOffers
+from appvocado.serializers import FavoriteOfferSerializer
 from appvocado.serializers import ReservationSerializer, OfferSerializer, UserSerializer, CustomRegisterSerializer, CategorySerializer, FriendsSerializer
 from appvocado.models import Reservation, Offer, Category, UserReview, Friends
 
@@ -198,7 +200,7 @@ class myOffers(APIView):
         serializer = OfferSerializer(offers, many = True)
         return Response(serializer.data)
 
-# Returns all the requests for my offers
+# Returns all the friends of the logged in user and allows to add one new
 class myFriends(APIView):
     def get(self, request):
         friends = Friends.objects.filter(Q(user_id_1 = request.user.id) | Q(user_id_2= request.user.id))    #library which allows to do an OR query
@@ -211,6 +213,27 @@ class myFriends(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Returns all the favorite offers of the logged user and allows to add a new one
+class favoriteOffers(APIView):
+    def get(self, request):
+        fav_offers = FavoriteOffers.objects.filter(user_id = request.user.id)    #library which allows to do an OR query
+        serializer = FavoriteOfferSerializer(fav_offers, many = True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        request.data["user_id"] = request.user.id
+        offer = Offer.objects.get(id = request.data["offer_id"])
+        if offer.user_id.id == request.user.id:    # I can not add as a favorite one of my own offers
+            return Response({"Message": "You can not add as a favorite one of your own offers."},status=status.HTTP_400_BAD_REQUEST)
+        serializer = FavoriteOfferSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except:
+                return Response({"Message": "You already favorited this item"},status=status.HTTP_409_CONFLICT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Returns all the requests for my offers

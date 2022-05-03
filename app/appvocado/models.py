@@ -25,14 +25,6 @@ class Offer(models.Model):
     def __str__(self):
         return self.title
 
-{
-    "category_id": "1",
-    "title" : "Kg of avocados",
-    "description": "I bought too many",
-    "image" : "",
-    "end_date": "",
-}
-
 class Reservation(models.Model):
     user_id  = models.ForeignKey(User, on_delete=models.CASCADE)
     offer_id = models.ForeignKey(Offer, on_delete=models.CASCADE)
@@ -44,9 +36,9 @@ class Reservation(models.Model):
         ]
     
         def __str__(self):
-            return 'offer: ' + self.user_id + ' user: ' + self.offer_id
+            return 'user: ' + self.user_id + ' offer: ' + self.offer_id
 
-
+# We do not really use it
 class UserReview(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     reviewer_id = models.IntegerField()
@@ -71,3 +63,15 @@ class Friends(models.Model):
     
         def __str__(self):
             return 'user_id_1: ' + self.user_id_1 + ' user_id_2: ' + self.user_id_2
+
+class FavoriteOffers(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    offer_id = models.ForeignKey(Offer, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields= ['user_id', 'offer_id'], name='unique_favorite_offer'),
+        ]
+    
+        def __str__(self):
+            return 'user: ' + self.user_id + ' offer: ' + self.offer_id
