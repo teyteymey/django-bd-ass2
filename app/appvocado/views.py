@@ -52,6 +52,9 @@ class clearDB(APIView):
         offers = Offer.objects.all()
         for offer in offers:
             offer.delete()
+        categories = Category.objects.all()
+        for cat in categories:
+            cat.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
         
 # Displays a list of reservations in the system.
@@ -142,7 +145,7 @@ class CategoryList(APIView):
 
     def get(self, request, format=None):
         cat = Category.objects.all()
-        serializer = OfferSerializer(cat, many=True)
+        serializer = CategorySerializer(cat, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -151,3 +154,10 @@ class CategoryList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Returns de details of an offer
+class CategoryDetails(APIView):
+    def get(self, request, id):
+        cat = get_object_or_404(Category, id = id)
+        serializer = CategorySerializer(cat)
+        return Response(serializer.data)
