@@ -13,5 +13,7 @@ urlpatterns = [
     path('reset_pass/', PasswordChangeView.as_view()),
     path('user/', views.UserDetail.as_view()),
     path('reservations/', views.ReservationList.as_view(), name='view_reservations'),
-    path('offers/', views.ReservationList.as_view(), name='view_offers'),
+    path('offers/', views.OfferList.as_view(), name='view_offers'),
+    path('offers/<int:id>', views.OfferDetails.as_view(), name='view_offer_deetails'),
+    path('categories/', views.CategoryList.as_view(), name='view_categories'),
 ]

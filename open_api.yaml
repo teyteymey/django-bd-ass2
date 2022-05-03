@@ -17,17 +17,47 @@ tags:
 - name: user
   description: user operations
 paths:
-  /credentials:
+  /register:
     post:
       tags:
-      - credentials
-      summary: test
-      description: test
+      - Authentication
+      summary: Create an account in the system
+      description: Allows you to create an account in the system
+      parameters:
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: password1
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: password2
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: first_name
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: last_name
+        in: query
+        required: true
+        schema:
+          type: string
       responses:
-        200:
-          description: succes
+        201:
+          description: created
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/User"
         400:
-          description: invalid credentials
+          description: Bad request
   /users:
     post:
       tags:
@@ -268,6 +298,10 @@ components:
         password:
           type: string
           format: password
+        first_name:
+          type: string
+        last_name:
+          type: string
     UserReview:
       type: object
       properties:
@@ -281,6 +315,15 @@ components:
           type: integer
           minimum: 0
           maximum: 10
+    RegisteredUser:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        
+      
   responses:
     404NotFound:
       description: //TODO

@@ -29,7 +29,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class OfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
-        fields = ('id', 'category_id', 'user_id', 'name', 'description', 'image', 'closed', 'end_date', 'created_at', 'closed_at')
+        fields = ('id', 'category_id', 'user_id', 'title', 'description', 'image', 'closed', 'end_date', 'created_at', 'closed_at')
 
 class ReservationSerializer(serializers.ModelSerializer):
     class Meta:

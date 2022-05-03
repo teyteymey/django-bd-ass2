@@ -1,3 +1,4 @@
+from unicodedata import category
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import *
@@ -5,8 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.contrib.auth.models import User
-from appvocado.serializers import CustomRegisterSerializer
-from appvocado.serializers import ReservationSerializer, OfferSerializer, UserSerializer
+from appvocado.serializers import ReservationSerializer, OfferSerializer, UserSerializer, CustomRegisterSerializer, CategorySerializer
 from appvocado.models import Reservation, Offer, Category, UserReview
 
 
@@ -63,9 +63,6 @@ class ReservationList(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        #data = self.request.data
-        #data['username'] = self.request.user.username
-        #data['username'] = request.user.username
         serializer = ReservationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -81,6 +78,8 @@ class OfferList(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
+        request.data["user_id"] = request.user.id
+        request.data["category_id"] = Category.objects.get(name = request.data["category_type"]).id
         serializer = OfferSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -89,8 +88,7 @@ class OfferList(APIView):
 
 class UserDetail(APIView):  #get, put and delete
 
-    def get(self, request):       #only the user can request this
-        #if not request.user.is_authenticated: raise NotAuthenticated
+    def get(self, request):
         serializer = CustomRegisterSerializer(request.user)
         return Response(serializer.data)  
 
@@ -131,3 +129,25 @@ class ReservationDetail(APIView):      #/rooms/pk: get, put and delete
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({"Message": "You can not delete the reservation of another user."},status=status.HTTP_403_FORBIDDEN)
+
+# Returns de details of an offer
+class OfferDetails(APIView):
+    def get(self, request, id):
+        offer = get_object_or_404(Offer, id = id)
+        serializer = OfferSerializer(offer)
+        return Response(serializer.data)
+
+# Displays a list of categories in the system.
+class CategoryList(APIView):
+
+    def get(self, request, format=None):
+        cat = Category.objects.all()
+        serializer = OfferSerializer(cat, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

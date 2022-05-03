@@ -18,12 +18,20 @@ class Offer(models.Model):
     description = models.CharField(max_length=256)
     image = models.ImageField(upload_to='images/')
     closed = models.BooleanField()
-    end_date = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    closed_at = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateField()
+    created_at = models.DateField(auto_now_add=True)
+    closed_at = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return self.title
+
+{
+    "category_id": "1",
+    "title" : "Kg of avocados",
+    "description": "I bought too many",
+    "image" : "",
+    "end_date": "",
+}
 
 class Reservation(models.Model):
     user_id  = models.ForeignKey(User, on_delete=models.CASCADE)
