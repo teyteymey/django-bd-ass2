@@ -1,6 +1,7 @@
 from email import message
 import re
 from unicodedata import category
+from django.db.models import Q
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import *
@@ -8,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.contrib.auth.models import User
-from appvocado.serializers import ReservationSerializer, OfferSerializer, UserSerializer, CustomRegisterSerializer, CategorySerializer
-from appvocado.models import Reservation, Offer, Category, UserReview
+from appvocado.serializers import ReservationSerializer, OfferSerializer, UserSerializer, CustomRegisterSerializer, CategorySerializer, FriendsSerializer
+from appvocado.models import Reservation, Offer, Category, UserReview, Friends
 
 
 mytoken = 'default'
@@ -196,6 +197,21 @@ class myOffers(APIView):
         offers = Offer.objects.filter(user_id = request.user.id)
         serializer = OfferSerializer(offers, many = True)
         return Response(serializer.data)
+
+# Returns all the requests for my offers
+class myFriends(APIView):
+    def get(self, request):
+        friends = Friends.objects.filter(Q(user_id_1 = request.user.id) | Q(user_id_2= request.user.id))    #library which allows to do an OR query
+        serializer = FriendsSerializer(friends, many = True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        request.data["user_id_1"] = request.user.id
+        serializer = FriendsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Returns all the requests for my offers
 class viewRequest(APIView):

@@ -21,4 +21,5 @@ urlpatterns = [
     path('user/requests', views.OfferRequests.as_view()),
     path('user/requests/<int:id>', views.viewRequest.as_view()), #accept it and see it
     path('user/offers', views.myOffers.as_view()),
+    path('user/friends', views.myFriends.as_view()),
 ]
