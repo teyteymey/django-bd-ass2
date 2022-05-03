@@ -5,5 +5,6 @@ from django.urls import path #re_path
 # from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView, PasswordChangeView
 
 urlpatterns = [
-    path('', views.ApiOverview, name='home')
+    path('', views.ApiOverview, name='home'),
+    path('reservations/', views.ReservationList.as_view(), name='view_reservations'),
 ]

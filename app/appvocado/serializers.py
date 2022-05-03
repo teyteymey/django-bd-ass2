@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from appvocado.models import Category, Offer, Reservation
+from appvocado.models import Category, Offer, Reservation, UserReview
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,3 +16,8 @@ class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = ('id', 'user_id', 'offer_id', 'accepted')
+
+class UserReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserReview
+        fields = ('id', 'user_id', 'reviewer:id', 'rating')
