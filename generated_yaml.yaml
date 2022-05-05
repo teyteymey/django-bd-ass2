@@ -2,6 +2,8 @@ openapi: 3.0.2
 info:
   title: 'Appvocado backend'
   version: ''
+  description: "Some of the calls need to be done by a logged in user. First register in the service and then log in. If you have authorization problems by doing this, delete the cookies."
+  
 paths:
   /:
     get:
@@ -16,7 +18,14 @@ paths:
               schema:
                 type: array
                 items: {}
+              example:
+                Clear database: "/deletedb    #clears all the data in the database"
+                Create an account: "/register    #registers a new user"
+                Login: "/login    #login to be authorised"
+                Logout: "/logout"
+                ...: "..."
           description: ''
+          
       tags:
       - ''
   /deletedb/:
@@ -33,67 +42,90 @@ paths:
     get:
       summary: 'List logged user details'
       operationId: listUserDetails
-      description: ''
-      parameters: []
+      description: 'List the details of the user logged in.'
       responses:
         '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+              examples:
+                objectExample:
+                    $ref: '#/components/examples/simple_user'
           description: ''
         '401':
-          description: 'Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+        - bearerAuth: []
+    
     put:
       summary: 'Edit details of user'
+      description: 'You do not need to put the username as it takes the user from the request. Specify the values of the attributes to change. You need to put the old values too, but the Flutter app will do this automatically'
       operationId: updateUserDetail
       parameters:
-      - name: username
+      - name: email
         in: query
-        required: false
+        required: true
         schema:
           type: string
       - name: first_name
         in: query
-        required: false
+        required: true
         schema:
           type: string
       - name: last_name
         in: query
-        required: false
+        required: true
         schema:
           type: string
       requestBody:
         content:
-          application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
+          application/json:    # Media type
+            schema:            # Request body contents
+              $ref: '#/components/schemas/User'   # Reference to an object
+            example:
+              email: changemyemail@gmail.com
+              first_name: Marta
+              last_name: Smith
       responses:
         '200':
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                objectExample:
+                    $ref: '#/components/examples/edited_simple_user'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+        - bearerAuth: []
+        
     delete:
+      summary: 'Delete my account'
       operationId: destroyUserDetail
-      description: ''
-      parameters: []
+      description: 'Deletes the account of the logged in user'
       responses:
         '204':
-          description: ''
+          description: 'No content'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+        - bearerAuth: []
+
   /user/{id}:
+    
     get:
+      summary: 'Get the details of another user'
       operationId: retrieveFriendDetail
-      description: ''
+      description: 'Allows the user to see the basic details of another user in the system.'
       parameters:
       - name: id
         in: path
@@ -105,10 +137,19 @@ paths:
         '200':
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                objectExample:
+                    $ref: '#/components/examples/simple_user'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+        - bearerAuth: []
+        
   /reservations/:
     get:
       operationId: listReservations
@@ -450,6 +491,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Login'
           description: ''
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'   # Reference to an object
+              example: 
+                # Properties of the referenced object
+                non_field_errors: "Unable to log in with provided credentials."
       tags:
       - login
   /reset_pass/:
@@ -518,7 +568,38 @@ paths:
           description: ''
       tags:
       - logout
+      
 components:
+  responses:
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          example:
+            detail: "Authentication credentials were not provided."
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  examples:
+    APIListExample:
+      value:
+        id: 1
+        name: new object
+      summary: A sample object
+    simple_user:
+      value:
+        username: marta01
+        email: marta01@gmail.com
+        first_name: Marta
+        last_name: Smith
+    edited_simple_user:
+      value:
+        username: marta01
+        email: changemyemail@gmail.com
+        first_name: Marta
+        last_name: Smith
   schemas:
     Offer:
       type: object

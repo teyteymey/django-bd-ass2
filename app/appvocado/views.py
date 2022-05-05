@@ -1,4 +1,4 @@
-from email import message
+
 import re
 from unicodedata import category
 from django.db.models import Q
@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from django.contrib.auth.models import User
 from appvocado.models import FavoriteOffers
@@ -44,7 +45,7 @@ def ApiOverview(request):
     }
     return Response(api_urls)
 
-# clears all the elements of offer, reservation and user in the database. It is useful for debugging
+# clears all the elements of offer, reservation, category and user in the database. It is useful for debugging
 class clearDB(APIView):
     
     def get(self, request):
@@ -62,8 +63,10 @@ class clearDB(APIView):
             cat.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
         
-# Displays a list of reservations in the system.
+# Displays the list of reservations of the logged user in the system and allows to create a new one.
+# Requires a user to be authenticated.
 class ReservationList(APIView):
+    permission_classes = [IsAuthenticated] 
 
     def get(self, request, format=None):
         reservation = Reservation.objects.all()
@@ -86,8 +89,10 @@ class ReservationList(APIView):
                 return Response({"Message": "You already reserved this item"},status=status.HTTP_409_CONFLICT)
         return Response({"Message": "You can not reserve your own item."}, status=status.HTTP_400_BAD_REQUEST)
 
-# Displays a list of offers in the system.
+# Displays a list of offers in the system and allows to publish a new one.
+# Requires a user to be logged in.
 class OfferList(APIView):
+    permission_classes = [IsAuthenticated] 
 
     def get(self, request, format=None):
         offer = Offer.objects.all()
@@ -103,14 +108,20 @@ class OfferList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+#Allows a user to see the data of another user.
+# Requires a user to be logged in.
 class FriendDetail(APIView):  #get
+    permission_classes = [IsAuthenticated] 
 
     def get(self, request, id):
         user = User.objects.get(id = id)
         serializer = CustomRegisterSerializer(user)
         return Response(serializer.data)  
 
+#Allows the user to see its details, edit them and delete its account.
+# Requires a user to be logged in.
 class UserDetail(APIView):  #get, put and delete
+    permission_classes = [IsAuthenticated] 
 
     def get(self, request):
         serializer = CustomRegisterSerializer(request.user)
@@ -124,12 +135,10 @@ class UserDetail(APIView):  #get, put and delete
         User.objects.filter(username = request.user.username).update(first_name=fn, last_name = ln, email = email)
         return Response (status = status.HTTP_200_OK)
 
-    def delete(self, request, username):
-        if username == request.user.username:
-            user = User.objects.get(username = username)
-            user.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        Response({"Message": "You can only delete your own account!"},status=status.HTTP_401_UNAUTHORIZED)
+    def delete(self, request):
+        user = User.objects.get(username = request.user.username)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # Returns de details of a reservation. Only authorised and logged in users can access this view, and only
 # treat with reservations that are their own.
