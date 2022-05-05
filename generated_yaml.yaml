@@ -296,18 +296,22 @@ paths:
   /user/requests:
     get:
       operationId: listOfferRequests
-      description: ''
-      parameters: []
+      summary: 'See all requests of the logged user'
+      description: 'Lists all the requests a user has recieved of their products'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
-          description: ''
+                $ref: '#/components/schemas/ArrayOfReservations'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+        - bearerAuth: []
+        
   /user/requests/{id}:
     get:
       operationId: retrieveviewRequest
@@ -583,11 +587,6 @@ components:
       scheme: bearer
       bearerFormat: JWT 
   examples:
-    APIListExample:
-      value:
-        id: 1
-        name: new object
-      summary: A sample object
     simple_user:
       value:
         username: marta01
@@ -601,6 +600,28 @@ components:
         first_name: Marta
         last_name: Smith
   schemas:
+    ArrayOfReservations:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          user_id:
+            type: integer
+          offer_id:
+            type: integer
+          accepted:
+            type: boolean
+      example:
+        - id: 10
+          user_id: 30
+          offer_id: 25
+          accepted: false
+        - id: 10
+          user_id: 30
+          offer_id: 25
+          accepted: true
     Offer:
       type: object
       properties:

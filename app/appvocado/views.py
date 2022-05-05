@@ -191,7 +191,7 @@ class CategoryDetails(APIView):
         serializer = CategorySerializer(cat)
         return Response(serializer.data)
 
-# Returns all the requests for my offers
+# Returns an array of the requests for my offers
 class OfferRequests(APIView):
     def get(self, request):
         wanted_items = set()
