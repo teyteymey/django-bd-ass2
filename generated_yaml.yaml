@@ -145,6 +145,12 @@ paths:
           description: 'OK'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              example:
+                Message: "This user does not exist."
       tags:
       - user
       security:
@@ -315,25 +321,31 @@ paths:
   /user/requests/{id}:
     get:
       operationId: retrieveviewRequest
-      description: ''
+      summary: 'See details of a request'
+      description: 'The user sees the information of one specific request made for one of its offers. The offer is the one identified with the id specified in the path.'
       parameters:
       - name: id
         in: path
         required: true
-        description: ''
         schema:
           type: string
       responses:
         '200':
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+        - bearerAuth: []
+        
     put:
       operationId: updateviewRequest
-      description: ''
+      description: 'Permits to edit a request of an offer of the logged user. Primarily it is used to accept it. The offer is the one identified with the id specified in the path.'
       parameters:
       - name: id
         in: path
@@ -343,20 +355,24 @@ paths:
           type: string
       requestBody:
         content:
-          application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
+          application/json:    # Media type
+            schema:            # Request body contents
+              $ref: '#/components/schemas/Reservation'
+            
       responses:
         '200':
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+      
+        - bearerAuth: []
   /user/offers:
     get:
       operationId: listmyOffers
@@ -676,12 +692,16 @@ components:
       properties:
         id:
           type: integer
+          example: 1
         user_id:
           type: integer
+          example: 25
         offer_id:
           type: integer
+          example: 125
         accepted:
           type: boolean
+          example: true
       required:
       - offer_id
     Category:

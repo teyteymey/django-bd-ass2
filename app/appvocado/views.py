@@ -69,7 +69,7 @@ class ReservationList(APIView):
     permission_classes = [IsAuthenticated] 
 
     def get(self, request, format=None):
-        reservation = Reservation.objects.all()
+        reservation = Reservation.objects.filter(user_id = request.user.id)
         serializer = ReservationSerializer(reservation, many=True)
         return Response(serializer.data)
 
@@ -114,9 +114,12 @@ class FriendDetail(APIView):  #get
     permission_classes = [IsAuthenticated] 
 
     def get(self, request, id):
-        user = User.objects.get(id = id)
-        serializer = CustomRegisterSerializer(user)
-        return Response(serializer.data)  
+        try:
+            user = User.objects.get(id = id)
+            serializer = CustomRegisterSerializer(user)
+            return Response(serializer.data)
+        except:
+            return Response({"Message": "This user does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
 #Allows the user to see its details, edit them and delete its account.
 # Requires a user to be logged in.
