@@ -65,22 +65,7 @@ paths:
       summary: 'Edit details of user'
       description: 'You do not need to put the username as it takes the user from the request. Specify the values of the attributes to change. You need to put the old values too, but the Flutter app will do this automatically'
       operationId: updateUserDetail
-      parameters:
-      - name: email
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: first_name
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: last_name
-        in: query
-        required: true
-        schema:
-          type: string
+      
       requestBody:
         content:
           application/json:    # Media type
@@ -180,12 +165,6 @@ paths:
       operationId: createReservationList
       description: 'Create a new reservation by specifying the id of the offer.'
       summary: 'Reserve an item'
-      parameters:
-      - name: offer_id
-        in: query
-        required: true
-        schema:
-          type: integer
       requestBody:
         content:
           application/json:
@@ -235,46 +214,13 @@ paths:
       operationId: createOfferList
       summary: 'Post a new offer'
       description: 'Allows the logged user to add a new offer to the system'
-      parameters:
-      - name: category_type
-        in: query
-        required: true
-        schema:
-          type: string
-          example: Fruit
-      - name: title
-        in: query
-        required: true
-        schema:
-          type: string
-          example: Kg of avocados
-      - name: description
-        in: query
-        required: true
-        schema:
-          type: string
-          example: Bought too many
-      - name: image
-        in: query
-        required: true
-        schema:
-          type: string
-          example: '1216161616112178523542.jpg'
-      - name: end_date
-        in: query
-        required: true
-        schema:
-          type: string
-          example: '2022-02-22'
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
                 category_id:
-                  type: integer
-                user_id:
                   type: integer
                 title:
                   type: string
@@ -283,98 +229,122 @@ paths:
                 image:
                   type: string
                   format: url
-                closed:
-                  type: boolean
                 end_date:
                   type: string
                   format: date-time
-                created_at:
-                  type: string
-                  format: date-time
-                closed_at:
-                  type: string
-                  format: date-time
       responses:
         '201':
-          content:
-            application/json:
-              schema: {}
-          description: ''
-      tags:
-      - offers
-  /offers/{id}:
-    get:
-      operationId: retrieveOfferDetails
-      description: ''
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: ''
-        schema:
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema: {}
-          description: ''
-      tags:
-      - offers
-  /categories/:
-    get:
-      operationId: listCategorys
-      description: ''
-      parameters: []
-      responses:
-        '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
-          description: ''
+                $ref: '#/components/schemas/Offer'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
-      - categories
-    post:
-      operationId: createCategoryList
-      description: ''
-      parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
-      responses:
-        '201':
-          content:
-            application/json:
-              schema: {}
-          description: ''
-      tags:
-      - categories
-  /categories/{id}:
+      - offers
+      security:
+        - bearerAuth: []
+        
+  /offers/{id}:
     get:
-      operationId: retrieveCategoryDetails
-      description: ''
+      operationId: retrieveOfferDetails
+      summary: 'See offer details'
+      description: 'View the atributes of a certain offer.'
       parameters:
       - name: id
         in: path
         required: true
-        description: ''
+        description: 'ID of the offer we want to see the details of.'
         schema:
           type: string
       responses:
         '200':
-          content:
-            application/json:
-              schema: {}
-          description: ''
+          description: 'OK'
+        '404':
+          description: 'Not found'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      tags:
+      - offers
+      security:
+        - bearerAuth: []
+  /categories/:
+    get:
+      operationId: listCategorys
+      description: 'See all existing categories'
+      summary: 'See existing categories'
+      responses:
+        '200':
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - categories
+      security:
+        - bearerAuth: []
+    post:
+      operationId: createCategoryList
+      summary: 'Post a new category'
+      description: 'Create a new category. The average user should not use this method.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                  format: url
+      responses:
+        '201':
+          description: 'Created'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              example:
+                name: "category with this name already exists."
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      tags:
+      - categories
+      security:
+        - bearerAuth: []
+        
+  /categories/{id}:
+    get:
+      operationId: retrieveCategoryDetails
+      description: 'See the details of a certain category.'
+      summary: 'See category'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'Id of the category we want to see the details of.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              example:
+                detail: "Not found."
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      tags:
+      - categories
+      security:
+        - bearerAuth: []
+        
+        
   /user/requests:
     get:
       operationId: listOfferRequests
@@ -436,12 +406,6 @@ paths:
         description: ''
         schema:
           type: string
-      - name: accepted
-        in: query
-        required: true
-        description: 'New value of the accepted attribute of the reservation identified by the id of the path.'
-        schema:
-          type: boolean
       requestBody:
         content:
           application/json:
@@ -510,13 +474,6 @@ paths:
       operationId: createmyFriends
       description: 'Allows to add a new friend.'
       summary: 'Add a new friend'
-      parameters:
-      - name: user_id_2
-        in: query
-        required: true
-        description: 'The id of the user we want to add as friend'
-        schema:
-          type: integer
       requestBody:
         content:
           application/json:
@@ -567,13 +524,6 @@ paths:
       operationId: createfavoriteOffers
       description: 'Adds a new offer as favorite to the logged in user.'
       summary: ' Set offer as favorite.'
-      parameters:
-      - name: offer_id
-        in: query
-        required: true
-        description: 'The id of the offer we want to add as favorite.'
-        schema:
-          type: integer
       requestBody:
         content:
           application/json:
