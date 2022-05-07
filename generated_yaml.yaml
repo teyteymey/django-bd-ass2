@@ -27,17 +27,18 @@ paths:
           description: ''
           
       tags:
-      - ''
+      - 'general'
   /deletedb/:
     get:
-      operationId: listclearDBs
+      operationId: listclearDBs+
+      summary: 'Delete items from DB'
       description: 'Deletes the Offers, Users, Categories and Reservations of the database. It is useful for debugging'
       parameters: []
       responses:
         '204':
           description: 'No content'
       tags:
-      - deletedb
+      - general
   /user/:
     get:
       summary: 'List logged user details'
@@ -155,69 +156,144 @@ paths:
       - user
       security:
         - bearerAuth: []
-        
+       
   /reservations/:
     get:
       operationId: listReservations
-      description: ''
-      parameters: []
+      description: 'List all the reservations made by the logged user.'
+      summary: 'See my reservations.'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
-          description: ''
+                $ref: '#/components/schemas/ArrayOfReservations'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - reservations
+      security:
+        - bearerAuth: []
+    
     post:
       operationId: createReservationList
-      description: ''
-      parameters: []
+      description: 'Create a new reservation by specifying the id of the offer.'
+      summary: 'Reserve an item'
+      parameters:
+      - name: offer_id
+        in: query
+        required: true
+        schema:
+          type: integer
       requestBody:
         content:
           application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
+            schema:
+              $ref: '#/components/schemas/Reservation'
+            example:
+              offer_id: 125
       responses:
         '201':
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              example:
+                Message: "The offer does not exist."
       tags:
       - reservations
+      security:
+        - bearerAuth: []
   /offers/:
     get:
       operationId: listOffers
-      description: ''
-      parameters: []
+      description: 'List all offers in the database.'
+      summary: 'List offers'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
-          description: ''
+                $ref: '#/components/schemas/ArrayOfOffers'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - offers
+      security:
+        - bearerAuth: []
+        
     post:
       operationId: createOfferList
-      description: ''
-      parameters: []
+      summary: 'Post a new offer'
+      description: 'Allows the logged user to add a new offer to the system'
+      parameters:
+      - name: category_type
+        in: query
+        required: true
+        schema:
+          type: string
+          example: Fruit
+      - name: title
+        in: query
+        required: true
+        schema:
+          type: string
+          example: Kg of avocados
+      - name: description
+        in: query
+        required: true
+        schema:
+          type: string
+          example: Bought too many
+      - name: image
+        in: query
+        required: true
+        schema:
+          type: string
+          example: '1216161616112178523542.jpg'
+      - name: end_date
+        in: query
+        required: true
+        schema:
+          type: string
+          example: '2022-02-22'
       requestBody:
         content:
-          application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
           multipart/form-data:
-            schema: {}
+            schema:
+              type: object
+              properties:
+                category_id:
+                  type: integer
+                user_id:
+                  type: integer
+                title:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                  format: url
+                closed:
+                  type: boolean
+                end_date:
+                  type: string
+                  format: date-time
+                created_at:
+                  type: string
+                  format: date-time
+                closed_at:
+                  type: string
+                  format: date-time
       responses:
         '201':
           content:
@@ -702,9 +778,9 @@ components:
           user_id: 30
           offer_id: 25
           accepted: false
-        - id: 10
+        - id: 11
           user_id: 30
-          offer_id: 25
+          offer_id: 26
           accepted: true
     ArrayOfOffers:
       type: array
