@@ -261,6 +261,10 @@ paths:
       responses:
         '200':
           description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
         '404':
           description: 'Not found'
         '401':
@@ -277,6 +281,10 @@ paths:
       responses:
         '200':
           description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfCategories'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       tags:
@@ -303,6 +311,10 @@ paths:
       responses:
         '201':
           description: 'Created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
         '400':
           description: 'Bad request'
           content:
@@ -331,6 +343,10 @@ paths:
       responses:
         '200':
           description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
         '404':
           description: 'Not Found'
           content:
@@ -693,6 +709,29 @@ components:
         first_name: Marta
         last_name: Smith
   schemas:
+    ArrayOfCategories:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          title:
+            type: string
+          description:
+            type: string
+          image:
+            type: string
+            format: url
+      example:
+        - id : 1
+          title: 'Fruits'
+          description: 'Fruit description'
+          image: "/static/media/images/pokemon_piplup.0.png"
+        - id : 2
+          title: 'Vegetables'
+          description: 'Veggie description'
+          image: "/static/media/images/pokemon_veggie.png"
     ArrayOfReservations:
       type: array
       items:
