@@ -222,9 +222,14 @@ class myFriends(APIView):
     def post(self, request, format=None):
         request.data["user_id_1"] = request.user.id
         serializer = FriendsSerializer(data=request.data)
+        if request.data["user_id_2"] == request.user.id:
+            return Response({"Message": "You can not add yourself as a friend."},status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            try:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except:
+                return Response({"Message": "You already are friends."},status=status.HTTP_409_CONFLICT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Returns all the favorite offers of the logged user and allows to add a new one
@@ -236,7 +241,10 @@ class favoriteOffers(APIView):
 
     def post(self, request, format=None):
         request.data["user_id"] = request.user.id
-        offer = Offer.objects.get(id = request.data["offer_id"])
+        try:
+            offer = Offer.objects.get(id = request.data["offer_id"])
+        except:
+             return Response({"Message": "The offer does not exist."},status=status.HTTP_400_BAD_REQUEST)
         if offer.user_id.id == request.user.id:    # I can not add as a favorite one of my own offers
             return Response({"Message": "You can not add as a favorite one of your own offers."},status=status.HTTP_400_BAD_REQUEST)
         serializer = FavoriteOfferSerializer(data=request.data)
@@ -259,20 +267,20 @@ class viewRequest(APIView):
         try:
             request = get_object_or_404(requests, id = id)
         except:
-            return Response({"Message": "You can not see the request of another user."},status=status.HTTP_403_FORBIDDEN)
+            return Response({"Message": "This request does not belong to you or does not exist."},status=status.HTTP_404_NOT_FOUND)
         serializer = ReservationSerializer(request)
         return Response(serializer.data)
     
     def put(self, request, id):
         wanted_items = set()
-        for item in Offer.objects.filter(user_id = request.user.id):
+        for item in Offer.objects.filter(user_id = request.user.id):    #Saves all the offer IDs done by the logged user
             wanted_items.add(item.id)
 
-        requests = Reservation.objects.filter(offer_id__in = wanted_items)
+        requests = Reservation.objects.filter(offer_id__in = wanted_items)  #takes all the reservations done of the items of the logged user
         try:
             request = get_object_or_404(requests, id = id)
         except:
-            return Response({"Message": "You can not accept the request of another user."},status=status.HTTP_403_FORBIDDEN)
+            return Response({"Message":  "This request does not belong to you or does not exist."},status=status.HTTP_404_NOT_FOUND)
         accepted = self.request.data.get('accepted')
         Reservation.objects.filter(id = id).update(accepted = accepted)
         return Response (status = status.HTTP_200_OK)

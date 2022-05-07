@@ -338,6 +338,12 @@ paths:
           description: 'OK'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: 'Not found'
+          content:
+            application/json:
+              example:
+                Message: "This request does not belong to you or does not exist."
       tags:
       - user
       security:
@@ -345,6 +351,7 @@ paths:
         
     put:
       operationId: updateviewRequest
+      summary: 'Edit one of the requests for my offer -> Accept the offer'
       description: 'Permits to edit a request of an offer of the logged user. Primarily it is used to accept it. The offer is the one identified with the id specified in the path.'
       parameters:
       - name: id
@@ -353,11 +360,19 @@ paths:
         description: ''
         schema:
           type: string
+      - name: accepted
+        in: query
+        required: true
+        description: 'New value of the accepted attribute of the reservation identified by the id of the path.'
+        schema:
+          type: boolean
       requestBody:
         content:
-          application/json:    # Media type
-            schema:            # Request body contents
+          application/json:
+            schema:
               $ref: '#/components/schemas/Reservation'
+            example:
+              accepted: True
             
       responses:
         '200':
@@ -368,6 +383,12 @@ paths:
           description: 'OK'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: 'Not found'
+          content:
+            application/json:
+              example:
+                Message: "This request does not belong to you or does not exist."
       tags:
       - user
       security:
@@ -375,87 +396,134 @@ paths:
         - bearerAuth: []
   /user/offers:
     get:
+      summary: 'Get offers from the logged user'
       operationId: listmyOffers
-      description: ''
-      parameters: []
+      description: 'Returns an array of the offers posted by the logged user.'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
-          description: ''
+                $ref: '#/components/schemas/ArrayOfOffers'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+        - bearerAuth: []
   /user/friends:
     get:
       operationId: listmyFriends
-      description: ''
-      parameters: []
+      description: 'Returns an array of the friends of the logged user.'
+      summary: 'Array of friends of the logged user'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
-          description: ''
+                $ref: '#/components/schemas/ArrayOfFriends'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+        - bearerAuth: []
     post:
       operationId: createmyFriends
-      description: ''
-      parameters: []
+      description: 'Allows to add a new friend.'
+      summary: 'Add a new friend'
+      parameters:
+      - name: user_id_2
+        in: query
+        required: true
+        description: 'The id of the user we want to add as friend'
+        schema:
+          type: integer
       requestBody:
         content:
           application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
+            schema:
+              $ref: '#/components/schemas/Friends'
+            example:
+              user_id_2: 2
       responses:
         '201':
+          description: 'Created'
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                $ref: '#/components/schemas/Friends'
+        '409':
+          description: 'Conflict'
+          content:
+            application/json:
+              example:
+                Message: "You already are friends."
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              example:
+                Message: "You can not add yourself as a friend."
       tags:
       - user
   /user/favorite_offers:
     get:
       operationId: listfavoriteOffers
-      description: ''
-      parameters: []
+      description: 'Lists the favorite offers of the logged user.'
+      summary: 'List the favorite offers'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
-          description: ''
+                $ref: '#/components/schemas/ArrayOfFriends'
+          description: 'OK'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       tags:
       - user
+      security:
+        - bearerAuth: []
     post:
       operationId: createfavoriteOffers
-      description: ''
-      parameters: []
+      description: 'Adds a new offer as favorite to the logged in user.'
+      summary: ' Set offer as favorite.'
+      parameters:
+      - name: offer_id
+        in: query
+        required: true
+        description: 'The id of the offer we want to add as favorite.'
+        schema:
+          type: integer
       requestBody:
         content:
           application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
+            schema:
+              $ref: '#/components/schemas/FavoriteOffers'
+            example:
+              offer_id: 2
       responses:
         '201':
+          description: 'Created'
           content:
             application/json:
-              schema: {}
-          description: ''
+              schema:
+                $ref: '#/components/schemas/FavoriteOffers'
+        '409':
+          description: 'Conflict'
+          content:
+            application/json:
+              example:
+                Message: "You already favorited this item."
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              example:
+                Message: "The offer does not exist."
       tags:
       - user
   /register/:
@@ -638,6 +706,88 @@ components:
           user_id: 30
           offer_id: 25
           accepted: true
+    ArrayOfOffers:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          category_id:
+            type: integer
+          user_id:
+            type: integer
+          title:
+            type: string
+          description:
+            type: string
+          image:
+            type: string
+            format: url
+          closed:
+            type: boolean
+          end_date:
+            type: string
+            format: date-time
+          created_at:
+            type: string
+            format: date-time
+          closed_at:
+            type: string
+            format: date-time
+      example:
+        - id: 10
+          category_id: 2
+          user_id: 25
+          title: 'Half a kg of avocados'
+          description: 'They are still good. Bought too many!'
+          image:  '/static/media/images/106388a52a51920d5a0e6b808ca1a7f1.jpg'
+          closed: false
+          end_date: "2022-02-22"
+          created_at: "2022-01-22"
+          closed_at: null
+        - id: 11
+          category_id: 2
+          user_id: 25
+          title: 'Half a kg of lemons'
+          description: 'They are still good. Bought too many!'
+          image:  '/static/media/images/Citrus_limon_Rutaceae.jpg'
+          closed: false
+          end_date: "2022-02-22"
+          created_at: "2022-01-22"
+          closed_at: null
+    ArrayOfFriends:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          user_id_1:
+            type: integer
+          user_id_2:
+            type: integer
+      example:
+        - id: 1
+          user_id_1: 2
+          user_id_2: 1
+        - id: 2
+          user_id_1: 2
+          user_id_2: 4
+    Friends:
+      type: object
+      properties:
+          id:
+            type: integer
+            example: 1
+          user_id_1:
+            type: integer
+            example: 1
+          user_id_2:
+            type: integer
+            example: 2
+      required:
+        - user_id_2
     Offer:
       type: object
       properties:
@@ -666,11 +816,11 @@ components:
           type: string
           format: date-time
       required:
-      - category_id
-      - title
-      - description
-      - image
-      - end_date
+        - category_id
+        - title
+        - description
+        - image
+        - end_date
     User:
       type: object
       properties:
@@ -736,6 +886,20 @@ components:
       required:
       - reviewer_id
       - rating
+    FavoriteOffers:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        offer_id:
+          type: integer
+          example: 5
+        user_id:
+          type: integer
+          example: 4
+      required:
+      - offer_id
     CustomRegister:
       type: object
       properties:
