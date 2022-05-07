@@ -146,6 +146,7 @@ class UserDetail(APIView):  #get, put and delete
 # Returns de details of a reservation. Only authorised and logged in users can access this view, and only
 # treat with reservations that are their own.
 class ReservationDetail(APIView):      #/rooms/pk: get, put and delete
+    permission_classes = [IsAuthenticated] 
 
     def get(self, request, id, username):
         res = get_object_or_404(Reservation, id = id)
@@ -167,6 +168,7 @@ class ReservationDetail(APIView):      #/rooms/pk: get, put and delete
 
 # Returns de details of an offer
 class OfferDetails(APIView):
+    permission_classes = [IsAuthenticated] 
     def get(self, request, id):
         offer = get_object_or_404(Offer, id = id)
         serializer = OfferSerializer(offer)
@@ -174,6 +176,7 @@ class OfferDetails(APIView):
 
 # Displays a list of categories in the system.
 class CategoryList(APIView):
+    permission_classes = [IsAuthenticated] 
 
     def get(self, request, format=None):
         cat = Category.objects.all()
@@ -189,6 +192,8 @@ class CategoryList(APIView):
 
 # Returns de details of an offer
 class CategoryDetails(APIView):
+    permission_classes = [IsAuthenticated] 
+
     def get(self, request, id):
         cat = get_object_or_404(Category, id = id)
         serializer = CategorySerializer(cat)
@@ -196,6 +201,8 @@ class CategoryDetails(APIView):
 
 # Returns an array of the requests for my offers
 class OfferRequests(APIView):
+    permission_classes = [IsAuthenticated] 
+
     def get(self, request):
         wanted_items = set()
         for item in Offer.objects.filter(user_id = request.user.id):
@@ -207,6 +214,8 @@ class OfferRequests(APIView):
 
 # Returns all the requests for my offers
 class myOffers(APIView):
+    permission_classes = [IsAuthenticated] 
+
     def get(self, request):
         offers = Offer.objects.filter(user_id = request.user.id)
         serializer = OfferSerializer(offers, many = True)
@@ -214,6 +223,8 @@ class myOffers(APIView):
 
 # Returns all the friends of the logged in user and allows to add one new
 class myFriends(APIView):
+    permission_classes = [IsAuthenticated] 
+
     def get(self, request):
         friends = Friends.objects.filter(Q(user_id_1 = request.user.id) | Q(user_id_2= request.user.id))    #library which allows to do an OR query
         serializer = FriendsSerializer(friends, many = True)
@@ -234,6 +245,8 @@ class myFriends(APIView):
 
 # Returns all the favorite offers of the logged user and allows to add a new one
 class favoriteOffers(APIView):
+    permission_classes = [IsAuthenticated] 
+
     def get(self, request):
         fav_offers = FavoriteOffers.objects.filter(user_id = request.user.id)    #library which allows to do an OR query
         serializer = FavoriteOfferSerializer(fav_offers, many = True)
@@ -258,6 +271,8 @@ class favoriteOffers(APIView):
 
 # Returns all the requests for my offers
 class viewRequest(APIView):
+    permission_classes = [IsAuthenticated] 
+    
     def get(self, request, id):
         wanted_items = set()
         for item in Offer.objects.filter(user_id = request.user.id):

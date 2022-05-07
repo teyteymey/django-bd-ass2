@@ -502,6 +502,9 @@ paths:
                 Message: "You can not add yourself as a friend."
       tags:
       - user
+      security:
+        - bearerAuth: []
+        
   /user/favorite_offers:
     get:
       operationId: listfavoriteOffers
@@ -552,52 +555,58 @@ paths:
                 Message: "The offer does not exist."
       tags:
       - user
+      security:
+        - bearerAuth: []
   /register/:
     post:
       operationId: createCustomRegister
-      description: ''
-      parameters: []
+      summary: 'Create a new account'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CustomRegister'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/CustomRegister'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/CustomRegister'
+            example:
+              username: 'DjangoUsername'
+              password1: 'djangopassword'
+              password2: 'djangopassword'
+              first_name: 'Django'
+              last_name: 'Backend'
       responses:
         '201':
+          description: 'Created'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomRegister'
-          description: ''
+                $ref: '#/components/schemas/User'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              example:
+                username: "A user with that username already exists."
       tags:
       - register
+      
   /login/:
     post:
       operationId: createLogin
+      summary: 'Log in into account'
       description: 'Check the credentials and return the REST Token
         if the credentials are valid and authenticated.
         Calls Django Auth login method to register User ID
         in Django session framework
         Accept the following POST parameters: username, password
         Return the REST Framework Token Object''s key.'
-      parameters: []
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Login'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Login'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Login'
+            example:
+              username: 'DjangoUsername'
+              password: 'djangopassword'
+
       responses:
         '201':
           content:
@@ -616,6 +625,7 @@ paths:
                 non_field_errors: "Unable to log in with provided credentials."
       tags:
       - login
+      
   /reset_pass/:
     post:
       operationId: createPasswordChange
@@ -644,42 +654,15 @@ paths:
       tags:
       - reset-pass
   /logout/:
-    get:
-      operationId: listLogouts
-      description: 'Calls Django logout method and delete the Token object
-        assigned to the current User object.
-        Accepts/Returns nothing.'
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
-      tags:
-      - logout
     post:
       operationId: createLogout
       description: 'Calls Django logout method and delete the Token object
         assigned to the current User object.
         Accepts/Returns nothing.'
       parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
       responses:
-        '201':
-          content:
-            application/json:
-              schema: {}
-          description: ''
+        '200':
+          description: 'OK'
       tags:
       - logout
       
@@ -850,15 +833,12 @@ components:
     User:
       type: object
       properties:
-        id:
+        pk:
           type: integer
-        email:
-          type: string
         username:
           type: string
-        password:
+        email:
           type: string
-          format: password
         first_name:
           type: string
         last_name:
