@@ -23,24 +23,23 @@ mytoken = 'default'
 def ApiOverview(request):
     api_urls = {
         'Clear database' : '/deletedb    #clears all the data in the database',
-        
         'Create an account': '/register    #registers a new user',
         'Login': '/login    #login to be authorised',
         'Logout': '/logout',
         'Reset password' : '/reset_pass',
-        'View my account' : '/user    #need to be logged in',
-        'Delete my account' : 'user/<str:username>',
-
+        'View, edit and delete my account' : '/user    #need to be logged in',
+        'See another users profile': '/user/<int:id>',
+        'See requests for my offers': '/user/requests',
+        'See and accept a request for my offers': '/user/requests/<int:id>',
+        'See my posted offers': '/user/offers',
+        'See my friends': '/user/friends',
+        'See my favorite offers': '/user/favorite_offers',
+        'See and add reservations': '/reservations',
+        'See categories' : '/categories',
+        'See category details': '/categories/<int:id>',
+        'See and post offers': '/offers',
+        'See offer details': '/offers/<int:id>',
         
-        'See and add reservations': 'user/<str:username>/reservations',
-        'See and delete my reservation' : 'user/<str:username>/reservations/<int:id>',
-        
-        'See all rooms': '/rooms', #post, get
-        'Search rooms by dates': '/rooms/?iniDate=date&?endDate=date',  #rooms/?endDate=2022-02-20&iniDate=2022-02-20
-        'See free rooms in a date': '/rooms/?FreeIndate=date',
-
-        'See room details': 'rooms/<str:code>', #get, put and delete
-        'See all reservations': '/reservations    #for debugging purposes, it would not make sense it was public', #get and post
 
     }
     return Response(api_urls)
