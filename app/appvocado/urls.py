@@ -7,8 +7,8 @@ from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView, PasswordC
 urlpatterns = [
     path('', views.ApiOverview, name='home'),
     path('deletedb/', views.clearDB.as_view()),
-    path('register/', RegisterView.as_view()), # do not insert an email, since it will want to confirm it
-    path('login/', LoginView.as_view()),
+    path('register/', RegisterView.as_view(), name = 'register'), # do not insert an email, since it will want to confirm it
+    path('login/', LoginView.as_view(), name = 'login'),
     path('logout/', LogoutView.as_view()),
     path('reset_pass/', PasswordChangeView.as_view()),
     path('user/', views.UserDetail.as_view()),

@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.openid',
     'appvocado',
-    'django_extensions'
 ]
 
 MIDDLEWARE = [

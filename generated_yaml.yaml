@@ -323,6 +323,12 @@ paths:
                 name: "category with this name already exists."
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '415':
+          description: 'Bad request'
+          content:
+            application/json:
+              example:
+                image:"["The submitted data was not a file. Check the encoding type on the form."]"
       tags:
       - categories
       security:
