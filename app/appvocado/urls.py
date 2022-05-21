@@ -9,7 +9,7 @@ urlpatterns = [
     path('deletedb/', views.clearDB.as_view()),
     path('register/', RegisterView.as_view(), name = 'register'), # do not insert an email, since it will want to confirm it
     path('login/', LoginView.as_view(), name = 'login'),
-    path('logout/', LogoutView.as_view()),
+    path('logout/', LogoutView.as_view(), name = 'logout'),
     path('reset_pass/', PasswordChangeView.as_view()),
     path('user/', views.UserDetail.as_view()),
     path('user/<int:id>', views.FriendDetail.as_view()),
@@ -19,7 +19,7 @@ urlpatterns = [
     path('categories/', views.CategoryList.as_view(), name='view_categories'),
     path('categories/<int:id>', views.CategoryDetails.as_view(), name='view_category_details'),
     path('user/requests', views.OfferRequests.as_view()),
-    path('user/requests/<int:id>', views.viewRequest.as_view()), #accept it and see it
+    path('user/requests/<int:id>', views.viewRequest.as_view(), name = 'view_request_details'), #accept it and see it
     path('user/offers', views.myOffers.as_view()),
     path('user/friends', views.myFriends.as_view()),
     path('user/favorite_offers', views.favoriteOffers.as_view()),

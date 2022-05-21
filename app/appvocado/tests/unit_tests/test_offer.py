@@ -25,6 +25,7 @@ class OffersTests(APITestCase):
         self.token = 'Bearer '+ self.token #set up the token in the call
         self.test_root = os.path.abspath(os.path.dirname(__file__))
 
+    #Linked to requirement RM2
     def test_create_offer_success(self):
         """
         Test the creation of offers
@@ -104,6 +105,7 @@ class OffersTests(APITestCase):
 
     #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
+    # Linked to requirement RM1
     def test_retrieve_offer_list_success(self):
         """
         Test a list of offers is retrieved

@@ -9,8 +9,8 @@ import requests
 
 from appvocado.models import Category, Offer, Reservation, Friends, FavoriteOffers
 
-#test de endpoints related to the model User
-class userTests(APITestCase):
+#test de endpoints related to the model Reservations
+class reservationTests(APITestCase):
 
     token = 'def'
     test_root = 'def'
@@ -30,50 +30,37 @@ class userTests(APITestCase):
         response = self.client.post(url)
         return super().tearDown()
 
-    def test_details_user_success(self):
+    def test_see_reservations_success(self):
         """
-        Test that we can see the details of the logged in user based on the logged in user
+        Test that we can see the reservations of the logged in user
         """
 
         headers = {
         'Authorization': self.token
         }
 
-        url = "http://127.0.0.1:8000/user/"
+        url = "http://127.0.0.1:8000/reservations/"
         response = requests.request("GET", url, headers=headers)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
-    def test_put_details_user_success(self):
+    # Linked to requirement RM3
+    def test_add_reservation_success(self):
         """
-        Test the edit of the atributes of the logged user
+        Test the creation of a new reservation of the logged in user
         """
 
         payload = {
-            "email": "changemyemail@gmail.com",
-            "first_name": "Marta",
-            "last_name": "Smith"
+            "offer_id": "1"
         }
 
         headers = {
         'Authorization': self.token
         }
 
-        url = "http://127.0.0.1:8000/user/"
-        response = requests.request("PUT", url, headers=headers, data = payload)
+        url = "http://127.0.0.1:8000/reservations/"
+        response = requests.request("POST", url, headers=headers, data = payload)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
-    def test_delete_user_success(self):
-        """
-        Test the edit of the atributes of the logged user
-        """
-        headers = {
-        'Authorization': self.token
-        }
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        url = "http://127.0.0.1:8000/user/"
-        response = requests.request("DELETE", url, headers=headers)
-
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
