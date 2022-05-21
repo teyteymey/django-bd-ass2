@@ -88,6 +88,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
+# to auto create the ids in modelss
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
