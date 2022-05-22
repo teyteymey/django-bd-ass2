@@ -3,6 +3,7 @@ from django.forms import CharField, DateField
 from django.contrib.auth.models import User
 from django.conf import settings
 
+#Model of Category
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.CharField(max_length=255)
@@ -11,6 +12,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+# Model of Offer
 class Offer(models.Model):
     category_id = models.ForeignKey(Category, on_delete=models.PROTECT)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -25,6 +27,7 @@ class Offer(models.Model):
     def __str__(self):
         return self.title
 
+# Model of reservation
 class Reservation(models.Model):
     user_id  = models.ForeignKey(User, on_delete=models.CASCADE)
     offer_id = models.ForeignKey(Offer, on_delete=models.CASCADE)
@@ -39,6 +42,7 @@ class Reservation(models.Model):
             return 'user: ' + self.user_id + ' offer: ' + self.offer_id
 
 # We do not really use it
+#Model of user Review
 class UserReview(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     reviewer_id = models.IntegerField()
@@ -52,6 +56,8 @@ class UserReview(models.Model):
         def __str__(self):
             return 'user_id: ' + self.user_id + ' reviewer_id: ' + self.reviewer_id + ' rating: ' + self.rating
 
+# Model of Friends
+# Has a uniqueness constraint.
 class Friends(models.Model):
     user_id_1 = models.IntegerField();
     user_id_2 = models.IntegerField();
@@ -64,6 +70,8 @@ class Friends(models.Model):
         def __str__(self):
             return 'user_id_1: ' + self.user_id_1 + ' user_id_2: ' + self.user_id_2
 
+# Model of Favorite Offers
+# Has a constraint of uniqueness so we can only favorite once an offer
 class FavoriteOffers(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     offer_id = models.ForeignKey(Offer, on_delete=models.CASCADE)

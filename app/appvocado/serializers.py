@@ -5,7 +5,7 @@ from appvocado.models import Category, Offer, Reservation, UserReview, Friends, 
 
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
-
+# Serializer to register user adding first and last names
 class CustomRegisterSerializer(RegisterSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
@@ -21,31 +21,39 @@ class CustomRegisterSerializer(RegisterSerializer):
             'last_name': self.validated_data.get('last_name', '')
         }
 
+# Serializer to create or edit an object of Category
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name', 'description', 'image')
 
+# Serializer to create or edit an object of Offer
 class OfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
         fields = ('id', 'category_id', 'user_id', 'title', 'description', 'image', 'closed', 'end_date', 'created_at', 'closed_at')
 
+# Serializer to create or edit an object of Reservation
 class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = ('id', 'user_id', 'offer_id', 'accepted')
 
+# Serializer to create or edit an object of UserReview
+#In this case, it fell out of scope of the project
 class UserReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserReview
         fields = ('id', 'user_id', 'reviewer_id', 'rating')
 
+# Serializer to create or edit an object of Friends
 class FriendsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Friends
         fields = ('id', 'user_id_1', 'user_id_2')
 
+# Serializer to create or edit an object of User
+# The User used is the one provided by django authorisation
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -59,6 +67,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+# Serializer to create or edit an object of Favorite Offer
 class FavoriteOfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavoriteOffers

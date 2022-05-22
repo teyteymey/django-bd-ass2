@@ -4,6 +4,9 @@ from django.urls import path #re_path
 from dj_rest_auth.registration.views import RegisterView, VerifyEmailView
 from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView, PasswordChangeView
 
+#list of all the endpoints available.
+# the complete specification is in the generated_yaml.yaml file in the root folder.
+# for better understanding of the calls, copy the content of the file and paste it in Swagger Editor
 urlpatterns = [
     path('', views.ApiOverview, name='home'),
     path('deletedb/', views.clearDB.as_view()),
