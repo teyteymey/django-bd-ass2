@@ -64,17 +64,4 @@ class friendTests(APITestCase):
         response = requests.request("GET", url, headers=headers, data=payload)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
-    def test_delete_user_success(self):
-        """
-        Test the edit of the atributes of the logged user
-        """
-        headers = {
-        'Authorization': self.token
-        }
-
-        url = "http://127.0.0.1:8000/user/"
-        response = requests.request("DELETE", url, headers=headers)
-
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
