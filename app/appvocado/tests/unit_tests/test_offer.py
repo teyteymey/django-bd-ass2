@@ -120,6 +120,7 @@ class OffersTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    # Linked to RM5 requirement
     def test_retrieve_offer_detail_success(self):
         """
         See details of an offer
@@ -149,3 +150,4 @@ class OffersTests(APITestCase):
         response = requests.request("GET", url, headers=headers)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        

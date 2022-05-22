@@ -28,6 +28,7 @@ class CategoryTests(APITestCase):
         self.test_root = os.path.abspath(os.path.dirname(__file__))
         
     # Create a category succesfully.
+    # Linked to RM6 requirement.
     def test_create_category_success(self):
 
         url = "http://127.0.0.1:8000/categories/"

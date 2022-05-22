@@ -30,7 +30,7 @@ class friendTests(APITestCase):
         response = self.client.post(url)
         return super().tearDown()
 
-    # RS3 requirement
+    # Linked to RS3 requirement
     def test_add_friend_success(self):
         """
         Test that we can add a new friend to the logged in user
