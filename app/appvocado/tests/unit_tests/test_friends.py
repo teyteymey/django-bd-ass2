@@ -10,7 +10,7 @@ import requests
 from appvocado.models import Category, Offer, Reservation, Friends, FavoriteOffers
 
 #test de endpoints related to the model User
-class userTests(APITestCase):
+class friendTests(APITestCase):
 
     token = 'def'
     test_root = 'def'
@@ -30,38 +30,38 @@ class userTests(APITestCase):
         response = self.client.post(url)
         return super().tearDown()
 
-    def test_details_user_success(self):
+    # RS3 requirement
+    def test_add_friend_success(self):
         """
-        Test that we can see the details of the logged in user based on the logged in user
+        Test that we can add a new friend to the logged in user
         """
+
+        payload = json.dumps({
+            "user_id_2": 2
+        })
 
         headers = {
         'Authorization': self.token
         }
 
-        url = "http://127.0.0.1:8000/user/"
-        response = requests.request("GET", url, headers=headers)
+        url = "http://127.0.0.1:8000/user/friends"
+        response = requests.request("POST", url, headers=headers, data=payload)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     
-    #Linked to requirement RS8
-    def test_put_details_user_success(self):
+    def test_see_friends_success(self):
         """
         Test the edit of the atributes of the logged user
         """
 
-        payload = {
-            "email": "changemyemail@gmail.com",
-            "first_name": "Marta",
-            "last_name": "Smith"
-        }
+        payload = {}
 
         headers = {
         'Authorization': self.token
         }
 
-        url = "http://127.0.0.1:8000/user/"
-        response = requests.request("PUT", url, headers=headers, data = payload)
+        url = "http://127.0.0.1:8000/user/friends"
+        response = requests.request("GET", url, headers=headers, data=payload)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
